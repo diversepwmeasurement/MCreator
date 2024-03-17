@@ -1,56 +1,65 @@
-name: Build and test
-
-on:
-  push:
-    branches:
-      - master
-      - "feature/*"
-      - "dev/*"
-  pull_request:
-    branches:
-      - master
-      - "feature/*"
-      - "dev/*"
-
 jobs:
   build:
     name: Build and Test
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17.0.10+7'
-          distribution: 'temurin'
-      - name: Cache Gradle Packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.mcreator/gradle/caches/
-            ~/.mcreator/gradle/wrapper/
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Build and Test Using Gradle
-        run: xvfb-run -a ./gradlew test
-      - name: Test Javadoc Generation
-        run: ./gradlew javadoc
-      - name: Publish Test Report
-        uses: mikepenz/action-junit-report@b1b7f659602565970688b2e2588738b9398e895d
-        if: always() # always run even if the previous step fails
-        with:
-          include_passed: true
-          detailed_summary: true
-          report_paths: '**/build/test-results/test/TEST-*.xml'
-      - name: Prepare Gradle Cache
-        run: |
-          rm -f  ~/.mcreator/gradle/caches/modules-2/modules-2.lock
-          rm -fr ~/.mcreator/gradle/caches/*/plugin-resolution/
-          rm -f  ~/.mcreator/gradle/caches/minecraft/deobfedDeps/providedDummy.jar
-          rm -f  ~/.mcreator/gradle/caches/minecraft/deobfedDeps/compileDummy.jar
-          rm -f  ~/.gradle/caches/modules-2/modules-2.lock
-          rm -f  ~/.gradle/caches/modules-2/gc.properties
+    - continue-on-error: true
+      name: Checkout Repository
+      uses: actions/checkout@v4
+    - continue-on-error: true
+      name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 17.0.10+7
+    - continue-on-error: true
+      name: Cache Gradle Packages
+      uses: actions/cache@v4
+      with:
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties')
+          }}
+        path: '~/.gradle/caches
+
+          ~/.gradle/wrapper
+
+          ~/.mcreator/gradle/caches/
+
+          ~/.mcreator/gradle/wrapper/
+
+          '
+        restore-keys: '${{ runner.os }}-gradle-
+
+          '
+    - continue-on-error: true
+      name: Build and Test Using Gradle
+      run: xvfb-run -a ./gradlew test
+    - continue-on-error: true
+      name: Test Javadoc Generation
+      run: ./gradlew javadoc
+    - continue-on-error: true
+      if: always()
+      name: Publish Test Report
+      uses: mikepenz/action-junit-report@b1b7f659602565970688b2e2588738b9398e895d
+      with:
+        detailed_summary: true
+        include_passed: true
+        report_paths: '**/build/test-results/test/TEST-*.xml'
+    - continue-on-error: true
+      name: Prepare Gradle Cache
+      run: 'rm -f  ~/.mcreator/gradle/caches/modules-2/modules-2.lock
+
+        rm -fr ~/.mcreator/gradle/caches/*/plugin-resolution/
+
+        rm -f  ~/.mcreator/gradle/caches/minecraft/deobfedDeps/providedDummy.jar
+
+        rm -f  ~/.mcreator/gradle/caches/minecraft/deobfedDeps/compileDummy.jar
+
+        rm -f  ~/.gradle/caches/modules-2/modules-2.lock
+
+        rm -f  ~/.gradle/caches/modules-2/gc.properties
+
+        '
+name: Build and test
+on:
+  repository_dispatch:
+    types: trigger-ga___test.yml

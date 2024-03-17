@@ -1,32 +1,31 @@
-name: Crowdin Pull
-
-on:
-  schedule:
-    - cron: '0 0 * * 5'
-  workflow_dispatch: {}
-
 jobs:
   crowdin-pull:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
-      - uses: crowdin/github-action@cb33a030bb1675169b76617d5805242aeea6eaec
-        name: Pull Crowdin translations
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
-          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
-        with:
-          config: crowdin.yml
-          crowdin_branch_name: master
-          upload_sources: false
-          upload_translations: false
-          download_translations: true
-          github_user_name: "github-actions"
-          github_user_email: "<>"
-          commit_message: "New Crowdin translations"
-          localization_branch_name: localization
-          pull_request_base_branch_name: master
-          create_pull_request: true
-          pull_request_title: "New Crowdin translations"
-          pull_request_body: "New Crowdin translations"
+    - continue-on-error: true
+      uses: actions/checkout@v4
+    - continue-on-error: true
+      env:
+        CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+        CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      name: Pull Crowdin translations
+      uses: crowdin/github-action@cb33a030bb1675169b76617d5805242aeea6eaec
+      with:
+        commit_message: New Crowdin translations
+        config: crowdin.yml
+        create_pull_request: true
+        crowdin_branch_name: master
+        download_translations: true
+        github_user_email: <>
+        github_user_name: github-actions
+        localization_branch_name: localization
+        pull_request_base_branch_name: master
+        pull_request_body: New Crowdin translations
+        pull_request_title: New Crowdin translations
+        upload_sources: false
+        upload_translations: false
+name: Crowdin Pull
+on:
+  repository_dispatch:
+    types: trigger-ga___crowdin-pull.yml

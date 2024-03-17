@@ -1,25 +1,23 @@
-name: Crowdin Push
-
-on:
-  push:
-    branches:
-      - master
-  workflow_dispatch: {}
-
 jobs:
   crowdin-push:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
-      - uses: crowdin/github-action@cb33a030bb1675169b76617d5805242aeea6eaec
-        name: Push sources to Crowdin
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
-          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
-        with:
-          config: crowdin.yml
-          crowdin_branch_name: master
-          upload_sources: true
-          upload_translations: false
-          download_translations: false
+    - continue-on-error: true
+      uses: actions/checkout@v4
+    - continue-on-error: true
+      env:
+        CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+        CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      name: Push sources to Crowdin
+      uses: crowdin/github-action@cb33a030bb1675169b76617d5805242aeea6eaec
+      with:
+        config: crowdin.yml
+        crowdin_branch_name: master
+        download_translations: false
+        upload_sources: true
+        upload_translations: false
+name: Crowdin Push
+on:
+  repository_dispatch:
+    types: trigger-ga___crowdin-push.yml

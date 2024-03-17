@@ -1,29 +1,30 @@
-name: Generate documentation
-
-on:
-  schedule:
-    - cron: "0 0 * * 1"
-  workflow_dispatch: {}
-
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
-        name: Checkout Repository
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17.0.10+7'
-          distribution: 'temurin'
-      - name: Generate Javadoc
-        run: ./gradlew javadoc
-      - name: Deploy Javadoc
-        uses: JamesIves/github-pages-deploy-action@65b5dfd4f5bcd3a7403bbc2959c144256167464e
-        with:
-          branch: javadoc
-          clean: true
-          folder: build/docs/javadoc
-          target-folder: .
-          git-config-name: "github-actions"
-          git-config-email: "<>"
+    - continue-on-error: true
+      name: Checkout Repository
+      uses: actions/checkout@v4
+    - continue-on-error: true
+      name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 17.0.10+7
+    - continue-on-error: true
+      name: Generate Javadoc
+      run: ./gradlew javadoc
+    - continue-on-error: true
+      name: Deploy Javadoc
+      uses: JamesIves/github-pages-deploy-action@65b5dfd4f5bcd3a7403bbc2959c144256167464e
+      with:
+        branch: javadoc
+        clean: true
+        folder: build/docs/javadoc
+        git-config-email: <>
+        git-config-name: github-actions
+        target-folder: .
+name: Generate documentation
+on:
+  repository_dispatch:
+    types: trigger-ga___documentation.yml
